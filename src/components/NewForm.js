@@ -1,98 +1,148 @@
-import { useFormik } from 'formik';
+import { Formik, Form, Field, ErrorMessage, FieldArray, FastField } from 'formik';
 import React from 'react';
 import './LevForm.scss'
 import * as Yup from 'yup';
+import ErorText from './ErorText';
 
 const initialValues = {
     name: '',
     lastname: '',
-    email: ''
+    email: '',
+    comments: '',
+    address: '',
+    social: {
+        facebook: '',
+        instagram: ''
+    },
+    phonenumbers: ['', ''],
+    phNumbers: ['']
 }
 const onSubmit = values => {
     console.log("submit value", values);
 }
 
-const validate = values => {
-    let errors = {}
+const validationSchema = Yup.object({
+    name: Yup.string()
+        .required("შევსება აუცილებელია"),
+    lastname: Yup.string()
+        .required("შევსება აუცილებელია"),
+    email: Yup.string()
+        .email("email invalid")
+        .required("შევსება აუცილებელია")
+})
 
-    if (!values.name) {
-        errors.name = "Required"
-    }
-    if (!values.email) {
-        errors.email = "Required"
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-        errors.email = 'Invalid email address'
-    }
-    if (!values.lastname) {
-        errors.lastname = "Required"
-    }
-
-    return errors
-}
-
-// const validationScheme = Yup.object({
-//     name: Yup.string()
-//         .required("Required"),
-//     lastname: Yup.string()
-//         .required("Required"),
-//     email: Yup.string()
-//         .email("email invalid")
-//         .required("Required")
-// })
-
+console.log("validate scheme");
 
 const NewForm = () => {
 
-    const formik = useFormik({
-        initialValues,
-        onSubmit,
-        // validationScheme
-        validate
-    })
-    console.log("Formik Erors:", formik.touched);
+    // console.log("Formik Erors:", formik.errors);
     return (
-        <div>
-            <form onSubmit={formik.handleSubmit}>
+        <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={onSubmit}
+            validateOnChange={false}>
+
+            <Form className='form'>
                 <div className="form-control">
                     <label htmlFor="name">Name</label>
-                    <input
+                    <Field
                         type="text"
                         id="name"
                         name="name"
-                        value={formik.values.name}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur} />
-
-                    {formik.touched.name && formik.errors.name ? <div className="error">{formik.errors.name}</div>
-                        : null}
+                    />
+                    <ErrorMessage name='name' component={ErorText} />
                 </div>
                 <div className="form-control">
                     <label htmlFor="lastname">Lastaname</label>
-                    <input
+                    <Field
                         type="text"
                         id="lastname"
                         name="lastname"
-                        value={formik.values.lastname}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur} />
-                    {formik.touched.lastname && formik.errors.lastname ? <div className="error">{formik.errors.lastname}</div>
-                        : null}
+                    />
+                    <ErrorMessage name='lastname'>
+                        {(ErorText) => <div className='error'>{ErorText}</div>}
+                    </ErrorMessage>
+
                 </div>
                 <div className="form-control">
                     <label htmlFor="email">Email</label>
-                    <input
+                    <Field
                         type="email"
                         id="email"
                         name="email"
-                        value={formik.values.email}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur} />
-                    {formik.touched.email && formik.errors.email ? <div className="error">{formik.errors.email}</div>
-                        : null}
+                    />
+                    <ErrorMessage name='email' />
                 </div>
-                <button type="submit">Submit</button>
-            </form>
-        </div>
+                <div className='form-control'>
+                    <label htmlFor='comments'>Comments</label>
+                    <Field as='textarea' id='comments' name='comments' />
+                </div>
+                <div className='form-control'>
+                    <label htmlFor='address'>Address</label>
+                    <FastField name='address'>
+                        {
+                            props => {
+                                console.log('Field Log');
+                                const { meta, form, field } = props
+                                return (
+                                    <div>
+                                        <input type='text' id='address' {...Field} />
+                                        {meta.touched && meta.error ? <div>{meta.error}</div> : null}
+                                    </div>
+                                )
+
+                            }
+                        }
+                    </FastField>
+                </div>
+                <div className='form-control'>
+                    <label htmlFor='facebook'>Facebook Url</label>
+                    <Field id='facebook' type='text' name='social.facebook' />
+                </div>
+                <div className='form-control'>
+                    <label htmlFor='instagram'>Instagram Url</label>
+                    <Field id='instagram' type='text' name='social.instagram' />
+                </div>
+                <div className='form-control'>
+                    <label htmlFor='phone'>Phone Number</label>
+                    <Field id='phone' type='number' name='phonenumbers[0]' />
+                </div>
+                <div className='form-control'>
+                    <label htmlFor='secondaryphone'>Secondary Phone Number</label>
+                    <Field id='secondaryphone' type='number' name='phonenumbers[1]' />
+                </div>
+                <div className='form-control'>
+                    <label htmlFor='listphones'>List Phone Numbers</label>
+                    <FieldArray name='phNumbers'>
+                        {
+                            (fieldArrayProps) => {
+                                const { push, remove, form } = fieldArrayProps
+                                const { values } = form
+                                const { phNumbers } = values
+
+                                return <div>
+                                    {
+                                        phNumbers.map((phNumber, index) => (
+                                            <div key={index}>
+                                                <Field name={`phNumbers[${index}]`} />
+                                                {
+                                                    index > 0 &&
+                                                    <button type='submit' onClick={() => remove(index)}> Remove </button>
+                                                }
+                                                <button type='submit' onClick={() => push()}> Add </button>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            }
+                        }
+
+                    </FieldArray>
+                </div>
+                <button type="submit" className='submit'>Submit</button>
+            </Form>
+        </Formik>
     );
 };
 

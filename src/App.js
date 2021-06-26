@@ -6,9 +6,9 @@ import NewForm from './components/NewForm';
 function App() {
   return (
     <div className="App">
-      <LevForm />
+      {/* <LevForm /> */}
       {/* <Test /> */}
-      {/* <NewForm /> */}
+      <NewForm />
     </div>
   );
 }

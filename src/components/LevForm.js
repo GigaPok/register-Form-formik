@@ -30,9 +30,9 @@ const validate = values => {
     return errors
 }
 
-const validationScheme = Yup.object({
+const validationSchema = Yup.object({
     name: Yup.string()
-        .required("Required"),
+        .required("Required!"),
     lastname: Yup.string()
         .required("Required"),
     email: Yup.string()
@@ -40,14 +40,14 @@ const validationScheme = Yup.object({
         .required("Required")
 })
 
-console.log("validate scheme", validationScheme);
+console.log("validate scheme");
 
 const LevForm = () => {
 
     const formik = useFormik({
         initialValues,
         onSubmit,
-        validationScheme
+        validationSchema
         // validate
     })
     console.log("Formik Erors:", formik.errors);

@@ -7,3 +7,17 @@
 .error {
     color: red;
 }
+
+.form {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    border: 1px solid #760c0c;
+
+    .submit {
+        height: 30px;
+        border: none;
+        cursor: pointer;
+        background-color: burlywood;
+    }
+}
